@@ -1,0 +1,22 @@
+# Environment & Credentials
+.env
+.env.local
+.env.development
+.env.production
+*.pem
+firebase-service-account.json
+
+# Dependencies
+node_modules/
+
+# Build & Cache
+dist/
+.cache/
+*.log
+npm-debug.log*
+
+# IDE & System
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
