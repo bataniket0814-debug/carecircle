@@ -171,14 +171,21 @@
 
   function speak(text) {
     if (!("speechSynthesis" in window)) return;
-    const u = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
     const want = t("speechLang");
     const base = want.split("-")[0];
-    const voices = speechSynthesis.getVoices();
-    let v = voices.find((x) => x.lang === want) || voices.find((x) => x.lang.startsWith(base));
-    if (!v && lang === "mr") v = voices.find((x) => x.lang.startsWith("hi"));
-    if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = want; }
+    const norm = (x) => x.lang.replace("_", "-").toLowerCase();
+    let v = voices.find((x) => norm(x) === want.toLowerCase()) ||
+            voices.find((x) => norm(x).startsWith(base));
+    if (!v && lang === "mr") v = voices.find((x) => norm(x).startsWith("hi"));
+    const u = new SpeechSynthesisUtterance(text);
+    if (v) { u.voice = v; u.lang = v.lang; }
+    else { u.lang = lang === "mr" ? "hi-IN" : want; }
     speechSynthesis.speak(u);
+  }
+
+  if ("speechSynthesis" in window) {
+    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
   }
 
   function statusOf(dose) {
