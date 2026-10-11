@@ -5,168 +5,376 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CareCircle</title>
 <style>
-  body { font-family: system-ui, "Nirmala UI", sans-serif; margin: 0; background: #f4f6fb; color: #1b2540; }
-  header { background: #1f3a5f; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-  header h1 { margin: 0; font-size: 20px; }
-  header small { color: #c8d4e6; }
-  main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; max-width: 1100px; margin: auto; }
-  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
-  section { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-  h2 { margin-top: 0; font-size: 17px; }
-  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; gap: 10px; }
-  .badge { padding: 3px 10px; border-radius: 99px; font-size: 13px; font-weight: 600; white-space: nowrap; }
-  .taken { background: #d9f5e1; color: #146c2e; }
-  .pending { background: #eef0f6; color: #556; }
-  .reminded { background: #fff1cc; color: #8a5a00; }
-  .alerted { background: #fddada; color: #a11; }
-  #chat { height: 260px; overflow-y: auto; background: #f4f6fb; border-radius: 8px; padding: 10px; margin: 10px 0; display: flex; flex-direction: column; }
-  .bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; margin: 5px 0; font-size: 14px; }
-  .alexa { background: #d6e6ff; align-self: flex-start; }
-  .aaji { background: #d9f5e1; align-self: flex-end; }
-  button, select { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccd; font-size: 14px; }
-  button { background: #1f3a5f; color: #fff; border: none; cursor: pointer; }
-  button.secondary { background: #e8ebf3; color: #1b2540; }
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  small.note { color: #667; display: block; margin-top: 10px; }
+  :root {
+    --navy: #14213d;
+    --gold: #c9a24a;
+    --cream: #f8f4ec;
+    --sand: #f1ece0;
+    --line: #e3dccb;
+    --ink: #14213d;
+    --muted: #5b6478;
+    --green: #0f6b5a;
+    --green-bg: #dff1e8;
+    --amber: #8a5a00;
+    --amber-bg: #fbe8c4;
+    --red: #a11f1f;
+    --red-bg: #fddada;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: system-ui, "Segoe UI", "Nirmala UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--sans); font-size: 17px; }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  header { background: var(--navy); border-bottom: 3px solid var(--gold); color: #fff; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand h1 { margin: 0; font-family: var(--serif); font-size: 32px; line-height: 1.1; }
+  .brand p { margin: 2px 0 0; color: #d6dcea; font-size: 15px; }
+  .lang { display: flex; align-items: center; gap: 10px; font-size: 15px; color: #d6dcea; }
+  .lang select { font: inherit; font-weight: 700; font-size: 18px; color: var(--navy); background: #fff; border: 2px solid var(--gold); border-radius: 12px; padding: 8px 12px; min-height: 44px; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; padding: 16px; } }
+
+  .card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 6px 24px rgba(20, 33, 61, .08); }
+  .card h2 { margin: 0; font-family: var(--serif); font-size: 30px; line-height: 1.15; }
+  .sub { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .pill { background: var(--sand); color: #7a5a14; font-weight: 700; font-size: 14px; padding: 5px 14px; border-radius: 99px; white-space: nowrap; }
+
+  .progress-label { margin: 22px 0 8px; font-weight: 800; font-size: 18px; }
+  .bar { height: 10px; background: #eadfcb; border-radius: 99px; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--green); border-radius: 99px; width: 0; transition: width .4s; }
+
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0; border-bottom: 1px solid #efe9da; }
+  .row:first-child { margin-top: 12px; border-top: 1px solid #efe9da; }
+  .row .left { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+  .time { font-family: var(--serif); font-size: 26px; font-weight: 800; }
+  .name { font-size: 18px; font-weight: 700; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 99px; font-size: 15px; font-weight: 800; white-space: nowrap; }
+  .badge svg { width: 16px; height: 16px; }
+  .taken { background: var(--green-bg); color: var(--green); }
+  .pending, .reminded { background: var(--amber-bg); color: var(--amber); }
+  .alerted { background: var(--red-bg); color: var(--red); }
+
+  .info { margin-top: 20px; background: var(--sand); border-radius: 14px; padding: 16px; display: flex; gap: 12px; font-size: 15px; line-height: 1.45; }
+  .info svg { width: 22px; height: 22px; flex: none; color: var(--green); }
+
+  .step { margin: 20px 0 10px; font-weight: 800; font-size: 18px; }
+  .meds { display: grid; gap: 10px; }
+  .med { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left; font: inherit; background: #fff; border: 2px solid #e0d6bf; border-radius: 14px; padding: 12px 18px; min-height: 56px; cursor: pointer; color: var(--ink); }
+  .med .n { font-size: 18px; font-weight: 800; }
+  .med .t { font-family: var(--serif); font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+  .med .t svg { width: 20px; height: 20px; color: var(--green); }
+  .med.on { border-color: var(--green); background: #e6f3ee; }
+  .primary { width: 100%; margin-top: 14px; font: inherit; font-weight: 800; font-size: 22px; color: #fff; background: var(--navy); border: 0; border-radius: 14px; padding: 16px; min-height: 60px; cursor: pointer; }
+  .primary:hover { background: #1d2f55; }
+
+  .talk { margin-top: 16px; background: var(--sand); border-radius: 16px; padding: 16px; min-height: 170px; display: flex; flex-direction: column; justify-content: center; }
+  .placeholder { text-align: center; color: var(--muted); font-size: 16px; line-height: 1.4; padding: 18px 28px; }
+  .placeholder svg { width: 34px; height: 34px; color: #9a6a10; display: block; margin: 0 auto 10px; }
+  .bubbles { display: flex; flex-direction: column; max-height: 230px; overflow-y: auto; }
+  .bubble { max-width: 88%; padding: 10px 14px; border-radius: 14px; margin: 5px 0; font-size: 17px; line-height: 1.4; }
+  .alexa { background: #dde8fb; align-self: flex-start; }
+  .aaji { background: var(--green-bg); align-self: flex-end; }
+  .hint { margin-top: 12px; background: var(--sand); border-radius: 12px; padding: 12px 16px; text-align: center; color: #3f4860; font-size: 16px; }
+  .reply { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn2 { font: inherit; font-weight: 800; font-size: 18px; border-radius: 14px; padding: 12px; min-height: 56px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn2 svg { width: 20px; height: 20px; }
+  .yes { background: var(--green); color: #fff; border: 2px solid var(--green); }
+  .say { background: #fff; color: var(--navy); border: 2px solid var(--navy); }
+  .over { display: block; margin: 16px 0 0 auto; background: none; border: 0; font: inherit; font-weight: 800; font-size: 15px; color: #3f4860; text-decoration: underline; cursor: pointer; padding: 8px; }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 8px 16px 32px; }
 </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>CareCircle</h1>
-    <small data-t="tagline"></small>
+  <div class="brand">
+    <svg width="46" height="32" viewBox="0 0 46 32" aria-hidden="true"><circle cx="15" cy="16" r="12" fill="none" stroke="#c9a24a" stroke-width="3"/><circle cx="30" cy="16" r="12" fill="none" stroke="#e8d9a8" stroke-width="3"/></svg>
+    <div>
+      <h1>CareCircle</h1>
+      <p data-t="tagline"></p>
+    </div>
   </div>
-  <select id="lang" aria-label="Language">
-    <option value="en">English</option>
-    <option value="hi">हिन्दी</option>
-    <option value="mr">मराठी</option>
-  </select>
+  <div class="lang">
+    <label for="lang" data-t="langLabel"></label>
+    <select id="lang">
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+      <option value="mr">मराठी</option>
+    </select>
+  </div>
 </header>
 
 <main>
-  <section>
-    <h2 data-t="dash"></h2>
+  <section class="card" aria-labelledby="dash-title">
+    <h2 id="dash-title" data-t="dash"></h2>
+    <p class="sub" data-t="today"></p>
+    <div class="progress-label" id="progress"></div>
+    <div class="bar"><div id="fill"></div></div>
     <div id="doses"></div>
-    <small class="note" data-t="note1"></small>
+    <div class="info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span data-t="note1"></span>
+    </div>
   </section>
 
-  <section>
-    <h2 data-t="sim"></h2>
-    <div class="controls">
-      <select id="med"></select>
-      <button onclick="startReminder()" data-t="start"></button>
-      <button class="secondary" onclick="resetDemo()" data-t="reset"></button>
+  <section class="card" aria-labelledby="sim-title">
+    <div class="head">
+      <h2 id="sim-title" data-t="sim"></h2>
+      <span class="pill" data-t="badge"></span>
     </div>
-    <div id="chat"></div>
-    <div class="controls">
-      <button class="secondary" onclick="markTaken()" data-t="yes"></button>
-      <button class="secondary" onclick="listen()" data-t="speak"></button>
+    <div class="step" data-t="step1"></div>
+    <div class="meds" id="meds" role="radiogroup"></div>
+    <button class="primary" id="startBtn" data-t="start"></button>
+
+    <div class="talk" id="talk">
+      <div class="placeholder" id="placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
+        <span data-t="placeholder"></span>
+      </div>
+      <div class="bubbles" id="bubbles" aria-live="polite"></div>
     </div>
-    <small class="note" data-t="note2"></small>
+
+    <div id="step2" hidden>
+      <div class="step" data-t="step2"></div>
+      <div class="reply">
+        <button class="btn2 yes" id="yesBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span data-t="yes"></span>
+        </button>
+        <button class="btn2 say" id="speakBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/></svg>
+          <span data-t="speak"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="hint" id="hint"></div>
+    <button class="over" id="overBtn" data-t="over"></button>
   </section>
 </main>
+<footer data-t="footer"></footer>
 
 <script>
   const UI = {
     en: {
-      tagline: "Voice medicine guardian for elders. Demo data only, not medical advice.",
+      tagline: "Your medicine companion: simple, spoken and safe.",
+      langLabel: "Language",
       dash: "Family Dashboard",
-      sim: "Aaji's Alexa+ (simulator)",
+      today: "Today's medicines",
+      progress: (n, m) => n + " of " + m + " taken today",
+      note1: "If a dose is still not taken after two reminders, we alert the caregiver on Telegram.",
+      sim: "Aaji's Alexa+",
+      badge: "Simulator",
+      step1: "1. Choose a medicine",
       start: "Start reminder",
-      reset: "Reset demo",
+      placeholder: "Press \u201cStart reminder\u201d and Alexa will speak to Aaji.",
+      hint0: "First choose a medicine, then press \u201cStart reminder\u201d.",
+      hint1: "Waiting for Aaji's reply. Say yes, or press the button.",
+      hintTaken: "Well done! The dose has been recorded.",
+      hintAlerted: "The caregiver has been alerted.",
+      step2: "2. Aaji's reply",
       yes: "Yes, I took it",
-      speak: "🎤 Speak",
-      note1: "Updates every 2 seconds. An alert goes to the caregiver on Telegram if a dose is still not taken after two reminders.",
-      note2: "Pick a medicine, press Start reminder, then reply by button or voice. Voice input works in Chrome.",
+      speak: "Speak",
+      over: "Start over",
+      footer: "Demo data only. Not medical advice.",
       taken: "Taken", pending: "Pending", reminded: "Reminded", alerted: "Caregiver alerted",
       thanks: "Thank you Aaji, I have noted it.",
       again: "Okay, I will remind you again.",
       family: "Your family has been alerted.",
       already: "That medicine is already taken.",
-      press: "Press Start reminder first.",
       novoice: "Voice input is not supported in this browser. Use the button.",
       speechLang: "en-IN",
       yesRe: /\b(yes|yeah|yep|taken|took)\b/i,
     },
     hi: {
-      tagline: "बुज़ुर्गों के लिए आवाज़ से चलने वाला दवा-सहायक। केवल डेमो डेटा, चिकित्सा सलाह नहीं।",
+      tagline: "आपकी दवा का साथी: सरल, बोलकर और सुरक्षित।",
+      langLabel: "भाषा",
       dash: "परिवार डैशबोर्ड",
-      sim: "आजी का Alexa+ (सिमुलेटर)",
+      today: "आज की दवाइयाँ",
+      progress: (n, m) => "आज " + m + " में से " + n + " दवा ली गई",
+      note1: "दो रिमाइंडर के बाद भी दवा न ली गई हो तो हम देखभालकर्ता को Telegram पर अलर्ट भेजते हैं।",
+      sim: "आजी का Alexa+",
+      badge: "सिमुलेटर",
+      step1: "1. दवा चुनें",
       start: "रिमाइंडर शुरू करें",
-      reset: "डेमो रीसेट करें",
+      placeholder: "\u201cरिमाइंडर शुरू करें\u201d दबाइए, Alexa आजी से बात करेगी।",
+      hint0: "पहले दवा चुनें, फिर \u201cरिमाइंडर शुरू करें\u201d दबाइए।",
+      hint1: "आजी के जवाब का इंतज़ार है। बोलिए या बटन दबाइए।",
+      hintTaken: "बहुत बढ़िया! दवा दर्ज हो गई।",
+      hintAlerted: "देखभालकर्ता को अलर्ट भेज दिया गया है।",
+      step2: "2. आजी का जवाब",
       yes: "हाँ, मैंने ले ली",
-      speak: "🎤 बोलिए",
-      note1: "हर 2 सेकंड में अपडेट होता है। दो रिमाइंडर के बाद भी दवा न ली गई हो तो देखभालकर्ता को Telegram पर अलर्ट जाता है।",
-      note2: "दवा चुनें, रिमाइंडर शुरू करें, फिर बटन या आवाज़ से जवाब दें। आवाज़ Chrome में चलती है।",
+      speak: "बोलिए",
+      over: "फिर से शुरू करें",
+      footer: "केवल डेमो डेटा। चिकित्सा सलाह नहीं।",
       taken: "ले ली", pending: "बाकी", reminded: "याद दिलाया", alerted: "परिवार को अलर्ट भेजा",
       thanks: "धन्यवाद आजी, मैंने नोट कर लिया।",
       again: "ठीक है, मैं फिर याद दिलाऊँगी।",
       family: "आपके परिवार को सूचित कर दिया गया है।",
       already: "यह दवा पहले ही ली जा चुकी है।",
-      press: "पहले रिमाइंडर शुरू करें दबाइए।",
       novoice: "इस ब्राउज़र में आवाज़ इनपुट उपलब्ध नहीं है। बटन का उपयोग करें।",
       speechLang: "hi-IN",
       yesRe: /(हाँ|हां|हा|ले ली|ले लिया|haan|\bhan\b|yes)/i,
     },
     mr: {
-      tagline: "वृद्धांसाठी आवाजावर चालणारा औषध-सहाय्यक. फक्त डेमो डेटा, वैद्यकीय सल्ला नाही.",
+      tagline: "तुमचा औषधांचा सोबती: सोपा, बोलका आणि सुरक्षित.",
+      langLabel: "भाषा",
       dash: "कुटुंब डॅशबोर्ड",
-      sim: "आजींचे Alexa+ (सिम्युलेटर)",
+      today: "आजची औषधे",
+      progress: (n, m) => "आज " + m + " पैकी " + n + " औषधे घेतली",
+      note1: "दोन आठवणींनंतरही औषध घेतले नसेल तर आम्ही काळजीवाहकाला Telegram वर अलर्ट पाठवतो.",
+      sim: "आजींचे Alexa+",
+      badge: "सिम्युलेटर",
+      step1: "1. औषध निवडा",
       start: "आठवण सुरू करा",
-      reset: "डेमो रीसेट करा",
+      placeholder: "\u201cआठवण सुरू करा\u201d दाबा, Alexa आजींशी बोलेल.",
+      hint0: "आधी औषध निवडा, मग \u201cआठवण सुरू करा\u201d दाबा.",
+      hint1: "आजींच्या उत्तराची वाट पाहत आहे. बोला किंवा बटण दाबा.",
+      hintTaken: "छान! औषधाची नोंद झाली.",
+      hintAlerted: "काळजीवाहकाला अलर्ट पाठवला आहे.",
+      step2: "2. आजींचे उत्तर",
       yes: "हो, मी घेतले",
-      speak: "🎤 बोला",
-      note1: "दर 2 सेकंदांनी अपडेट होते. दोन आठवणींनंतरही औषध घेतले नसेल तर काळजीवाहकाला Telegram वर अलर्ट जातो.",
-      note2: "औषध निवडा, आठवण सुरू करा, मग बटणाने किंवा आवाजाने उत्तर द्या. आवाज Chrome मध्ये चालतो.",
+      speak: "बोला",
+      over: "पुन्हा सुरू करा",
+      footer: "फक्त डेमो डेटा. वैद्यकीय सल्ला नाही.",
       taken: "घेतले", pending: "बाकी", reminded: "आठवण दिली", alerted: "कुटुंबाला अलर्ट पाठवला",
       thanks: "धन्यवाद आजी, मी नोंद केली आहे.",
       again: "ठीक आहे, मी पुन्हा आठवण करून देईन.",
       family: "तुमच्या कुटुंबाला कळवण्यात आले आहे.",
       already: "हे औषध आधीच घेतले आहे.",
-      press: "आधी आठवण सुरू करा दाबा.",
       novoice: "या ब्राउझरमध्ये आवाज इनपुट उपलब्ध नाही. बटण वापरा.",
       speechLang: "mr-IN",
       yesRe: /(हो|होय|घेतली|घेतले|घेतलं|\bho\b|yes)/i,
     },
   };
 
+  const ICON = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  };
+
   let lang = "en";
   let state = { schedule: [], reminders: {} };
+  let selectedId = null;
   let currentId = null;
   let shown = {};
-  const chat = document.getElementById("chat");
-  const medSelect = document.getElementById("med");
-  const langSelect = document.getElementById("lang");
+  let sigDash = "";
+  let sigMeds = "";
+
+  const $ = (id) => document.getElementById(id);
+  const bubbles = $("bubbles");
 
   function t(key) { return UI[lang][key]; }
 
-  function applyLang() {
+  function applyStatic() {
     document.documentElement.lang = lang;
     for (const el of document.querySelectorAll("[data-t]")) {
       el.textContent = t(el.dataset.t);
     }
-    buildMedSelect();
-    renderDoses();
   }
 
-  function buildMedSelect() {
-    const keep = medSelect.value;
-    medSelect.innerHTML = "";
+  function statusOf(dose) {
+    if (dose.taken) return [t("taken"), "taken", "check"];
+    const r = state.reminders[dose.id];
+    if (r && r.status === "alerted") return [t("alerted"), "alerted", "bell"];
+    if (r && (r.status === "reminded_1" || r.status === "reminded_2")) return [t("reminded"), "reminded", "bell"];
+    return [t("pending"), "pending", "clock"];
+  }
+
+  function renderDash() {
+    const sig = lang + "|" + state.schedule.map((d) => d.id + ":" + statusOf(d)[1]).join(",");
+    if (sig === sigDash) return;
+    sigDash = sig;
+    const total = state.schedule.length;
+    const done = state.schedule.filter((d) => d.taken).length;
+    $("progress").textContent = t("progress")(done, total);
+    $("fill").style.width = total ? Math.round((done / total) * 100) + "%" : "0%";
+    const box = $("doses");
+    box.innerHTML = "";
     for (const dose of state.schedule) {
-      const opt = document.createElement("option");
-      opt.value = dose.id;
-      opt.textContent = dose.names[lang] + " (" + dose.time + ")";
-      medSelect.appendChild(opt);
+      const [label, cls, icon] = statusOf(dose);
+      const row = document.createElement("div");
+      row.className = "row";
+      const left = document.createElement("div");
+      left.className = "left";
+      const time = document.createElement("span");
+      time.className = "time";
+      time.textContent = dose.time;
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = dose.names[lang];
+      left.append(time, name);
+      const badge = document.createElement("span");
+      badge.className = "badge " + cls;
+      badge.innerHTML = ICON[icon];
+      const text = document.createElement("span");
+      text.textContent = label;
+      badge.append(text);
+      row.append(left, badge);
+      box.appendChild(row);
     }
-    if (keep) medSelect.value = keep;
+  }
+
+  function renderMeds() {
+    const sig = lang + "|" + selectedId + "|" + state.schedule.map((d) => d.id).join(",");
+    if (sig === sigMeds) return;
+    sigMeds = sig;
+    const box = $("meds");
+    box.innerHTML = "";
+    for (const dose of state.schedule) {
+      const on = dose.id === selectedId;
+      const b = document.createElement("button");
+      b.className = "med" + (on ? " on" : "");
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", on ? "true" : "false");
+      const n = document.createElement("span");
+      n.className = "n";
+      n.textContent = dose.names[lang];
+      const tm = document.createElement("span");
+      tm.className = "t";
+      const tt = document.createElement("span");
+      tt.textContent = dose.time;
+      tm.append(tt);
+      if (on) tm.insertAdjacentHTML("beforeend", ICON.check);
+      b.append(n, tm);
+      b.onclick = () => { selectedId = dose.id; sigMeds = ""; renderMeds(); renderHint(); };
+      box.appendChild(b);
+    }
+  }
+
+  function renderHint() {
+    let key = "hint0";
+    if (currentId) {
+      const dose = state.schedule.find((d) => d.id === currentId);
+      const r = state.reminders[currentId];
+      if (dose && dose.taken) key = "hintTaken";
+      else if (r && r.status === "alerted") key = "hintAlerted";
+      else key = "hint1";
+    }
+    $("hint").textContent = t(key);
+    $("step2").hidden = !currentId;
+  }
+
+  function updatePlaceholder() {
+    $("placeholder").hidden = bubbles.childElementCount > 0;
   }
 
   function addBubble(text, who) {
     const div = document.createElement("div");
     div.className = "bubble " + who;
     div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+    bubbles.appendChild(div);
+    bubbles.scrollTop = bubbles.scrollHeight;
+    updatePlaceholder();
+  }
+
+  function clearTalk() {
+    bubbles.innerHTML = "";
+    updatePlaceholder();
   }
 
   function speak(text) {
@@ -183,34 +391,8 @@
     else { u.lang = lang === "mr" ? "hi-IN" : want; }
     speechSynthesis.speak(u);
   }
-
   if ("speechSynthesis" in window) {
     speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-  }
-
-  function statusOf(dose) {
-    if (dose.taken) return [t("taken"), "taken"];
-    const r = state.reminders[dose.id];
-    if (r && r.status === "alerted") return [t("alerted"), "alerted"];
-    if (r && (r.status === "reminded_1" || r.status === "reminded_2")) return [t("reminded"), "reminded"];
-    return [t("pending"), "pending"];
-  }
-
-  function renderDoses() {
-    const box = document.getElementById("doses");
-    box.innerHTML = "";
-    for (const dose of state.schedule) {
-      const [label, cls] = statusOf(dose);
-      const row = document.createElement("div");
-      row.className = "row";
-      const left = document.createElement("span");
-      left.textContent = dose.time + "  " + dose.names[lang];
-      const badge = document.createElement("span");
-      badge.className = "badge " + cls;
-      badge.textContent = label;
-      row.append(left, badge);
-      box.appendChild(row);
-    }
   }
 
   function showNewLines() {
@@ -234,8 +416,10 @@
     try {
       const res = await fetch("/api/state");
       state = await res.json();
-      if (medSelect.options.length !== state.schedule.length) buildMedSelect();
-      renderDoses();
+      if (!selectedId && state.schedule.length) selectedId = state.schedule[0].id;
+      renderDash();
+      renderMeds();
+      renderHint();
       showNewLines();
     } catch (e) {
       console.log("Server not reachable", e);
@@ -243,23 +427,22 @@
   }
 
   async function startReminder() {
-    const id = medSelect.value;
-    const res = await fetch("/api/remind/" + id + "?lang=" + lang, { method: "POST" });
+    if (!selectedId) return;
+    const res = await fetch("/api/remind/" + selectedId + "?lang=" + lang, { method: "POST" });
     const data = await res.json();
     if (!data.ok) {
       if (data.message === "already taken") addBubble(t("already"), "alexa");
       return;
     }
-    currentId = id;
-    shown[id] = 0;
+    clearTalk();
+    currentId = selectedId;
+    shown[currentId] = 0;
+    renderHint();
     refresh();
   }
 
   async function markTaken() {
-    if (!currentId) {
-      addBubble(t("press"), "alexa");
-      return;
-    }
+    if (!currentId) return;
     addBubble(t("yes"), "aaji");
     await fetch("/api/log/" + currentId, { method: "POST" });
     addBubble(t("thanks"), "alexa");
@@ -294,22 +477,35 @@
 
   async function resetDemo() {
     await fetch("/api/reset", { method: "POST" });
-    chat.innerHTML = "";
+    clearTalk();
     currentId = null;
     shown = {};
+    sigDash = "";
+    sigMeds = "";
     if ("speechSynthesis" in window) speechSynthesis.cancel();
     refresh();
   }
 
-  langSelect.onchange = () => {
-    lang = langSelect.value;
-    chat.innerHTML = "";
+  $("startBtn").onclick = startReminder;
+  $("yesBtn").onclick = markTaken;
+  $("speakBtn").onclick = listen;
+  $("overBtn").onclick = resetDemo;
+  $("lang").onchange = () => {
+    lang = $("lang").value;
+    clearTalk();
     currentId = null;
+    sigDash = "";
+    sigMeds = "";
     if ("speechSynthesis" in window) speechSynthesis.cancel();
-    applyLang();
+    applyStatic();
+    renderDash();
+    renderMeds();
+    renderHint();
   };
 
-  applyLang();
+  applyStatic();
+  updatePlaceholder();
+  renderHint();
   refresh();
   setInterval(refresh, 2000);
 </script>
